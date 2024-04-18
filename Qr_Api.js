@@ -1,40 +1,34 @@
 import React, { useState } from 'react';
 
-const QRCodeDisplay = () => {
-  const [qrCodeUrl, setQRCodeUrl] = useState('');
+function App() {
   const [text, setText] = useState('');
+  const [qrCodeUrl, setQrCodeUrl] = useState('');
 
-  const fetchQRCode = async () => {
-    try {
-      const response = await fetch(
-        `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${text}`
-      );
-      const responseData = await response.json();
-      setQRCodeUrl(responseData.image);
-    } catch (error) {
-      console.error('Error fetching QR code:', error);
-    }
+  const handleInputChange = (event) => {
+    setText(event.target.value);
   };
 
-  const handleInputChange = (e) => {
-    const inputText = e.target.value;
-    setText(inputText);
-    if (inputText) {
-      fetchQRCode();
-    } else {
-      setQRCodeUrl('');
-    }
+  const generateQRCode = () => {
+    fetch(`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${text}`)
+      .then((response) => response.url)
+      .then((qrCodeUrl) => {
+        setQrCodeUrl(qrCodeUrl);
+      });
   };
 
   return (
     <div>
       <h1>QR Code Generator</h1>
-      <p>Enter the text or URL:</p>
-      <input value={text} onChange={handleInputChange} />
-      {qrCodeUrl && <img src={qrCodeUrl} alt="QR Code" />}
+      <input type="text" value={text} onChange={handleInputChange} placeholder="Enter text to encode" />
+      <button onClick={generateQRCode}>Generate QR Code</button>
+      {qrCodeUrl && (
+        <div>
+          <h2>QR Code:</h2>
+          <img src={qrCodeUrl} alt="Generated QR Code" />
+        </div>
+      )}
     </div>
   );
-};
+}
 
-export default QRCodeDisplay;
-
+export default App;
